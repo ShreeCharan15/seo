@@ -5,11 +5,13 @@ class RoomService(Staff):
         super().__init__(id=id)
         self._services=self._db["Services"]
     def viewRequests(self):
-        reqs=self._services.find({"service":"Room Service","fulfilled":False})
+        reqs=list(self._services.find({"service":"Room Service","fulfilled":False}))
         print("\nRoom Service Requests")
-        print("Request ID\t\t\tTime Stamp\t\t\tCustomer ID\t\t\tService")
+        print("Index\t\t\tTime Stamp\t\t\tCustomer ID\t\t\tService")
+        index=0
         for x in reqs:
-            print(str(x["_id"])+"\t"+str(x["timestamp"])+"\t"+x["customer_id"]+"\t"+x["service"])
+            print(str(index)+")\t"+str(x["timestamp"])+"\t"+x["customer_id"]+"\t"+x["service"])
+            index+=1
         return reqs
 
 

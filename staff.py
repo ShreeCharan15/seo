@@ -52,9 +52,17 @@ class Staff:
     def finishTask(self):
         if(len(self.tasks)>0):
             print(self.tasks)
-            print("Enter index of finished task: ")
-            index=int(input())
-            self._staff.update_one({"_id":ObjectId(self.sid)},{"$pull":{"tasks":self.tasks[index]}})
-            self.tasks.pop(index)
+            while True:
+                print("Enter index of finished task: ")
+                index=int(input())
+                if index==-1:
+                    break
+                if index>=len(self.tasks):
+                    print("Invalid index")
+                    continue
+                else:
+                    self._staff.update_one({"_id":ObjectId(self.sid)},{"$pull":{"tasks":self.tasks[index]}})
+                    self.tasks.pop(index)
+                    break
         else:
             print("No tasks to finish")
