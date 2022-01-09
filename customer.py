@@ -1,21 +1,31 @@
 from datetime import datetime
+from bson.objectid import ObjectId
 import pymongo
 from restaurant import Restaurant
 from clubhouse import ClubHouse
 class Customer:
     
-    def __init__(self) -> None:
+    def __init__(self,id=None) -> None:
         self._client=pymongo.MongoClient("mongodb://localhost:27017/")
         self._db=self._client["hotel"]
         self._bookings=self._db["Bookings"]
         self._customers=self._db["Customers"]
         self._food=self._db["Food"]
         self._services=self._db["Services"]
-        self.name=None
-        self.email=None
-        self.phone=None
-        self.cid=None
-        self.login()
+        if (id==None):
+            self.name=None
+            self.email=None
+            self.phone=None
+            self.cid=None
+            self.login()
+        else:
+            self.cid=id
+            user=self._customers.find_one({"_id":ObjectId(self.cid)})
+            self.name=user["name"]
+            self.email=user["email"]
+            self.phone=user["phone"]
+            self.checkedIn=user["checkedIn"] if "checkedIn" in user else False
+            self.login()
     def login(self):
         print("\n")
         while True:
@@ -44,9 +54,14 @@ class Customer:
                     self.email=user["email"]
                     self.phone=user["phone"]
                     self.cid=str(user["_id"])
+                    self.checkedIn=user["checkedIn"] if "checkedIn" in user else False
                     break
                 else:
                     print("Login Failed")
+    def checkIn(self):
+        self._customers.update_one({"_id":ObjectId(self.cid)},{"$set":{"checkedIn":True}})
+        self.checkedIn=True
+
     def makeBooking(self):
         print("\n")
         while True:
@@ -69,7 +84,7 @@ class Customer:
                 print(e)
 
     def listBookings(self):
-        print("\n Bookings")
+        print("\nBookings")
         bookings=self._bookings.find({"customer_id":self.cid})
         if self._bookings.count_documents({"customer_id":self.cid})==0:
             print("No confirmed bookings")
@@ -77,9 +92,21 @@ class Customer:
             for x in bookings:
                 print(x["name"]+"\t\t"+x["email"]+"\t\t"+str(x["phone"])+"\t\t"+str(x["date"])+"\t\t"+("Room No :"+str(x["room"]) if x["room"]!=None else "Not Confirmed"))
         return bookings
+    def listConfirmedBookings(self):
+        print("\nConfirmed Bookings:")
+        bookings=list(self._bookings.find({"customer_id":self.cid,"room":{'$ne':None}}))
+        if self._bookings.count_documents({"customer_id":self.cid,"room":{'$ne':None}})==0:
+            print("No confirmed bookings")
+        else:
+            index=0
+            for x in bookings:
+                print(str(index)+")\t\t"+x["name"]+"\t\t"+x["email"]+"\t\t"+str(x["phone"])+"\t\t"+str(x["date"])+"\t\t"+("Room No :"+str(x["room"]) if x["room"]!=None else "Not Confirmed"))
+                index+=1
+        
+        return bookings
 
     def orderFood(self):
-        print("\n Menu")
+        print("\nMenu")
         menu=Restaurant().menu()
         index=0
         for key,value in menu.items():
@@ -90,10 +117,14 @@ class Customer:
             food=int(input("Enter Food index: "))
             if food==-1:
                 break
+            elif food>=len(menu):
+                print("Invalid index")
+                continue
             try:
                 key=list(menu.keys())[food]
                 print(key)
                 self._food.insert_one({"customer_id":self.cid,"timestamp":datetime.now(),"food":key,"served":False})
+                print("Food Ordered\n")
                 break
             except Exception as e:
                 print(e)
@@ -103,7 +134,8 @@ class Customer:
         if self._food.count_documents({"customer_id":self.cid})==0:
             print("No food orders")
         else:
-            print("\n Food Orders")
+            print("\nFood Orders")
+            print("Timestamp\t\t\t\tFood\t\tServed")
             for x in orders:
                 print(str(x["timestamp"])+"\t\t"+str(x["food"])+"\t\t"+str(x["served"]))
         return orders
@@ -130,6 +162,9 @@ class Customer:
             service=int(input("Enter Service index: "))
             if service==-1:
                 break
+            elif service>=len(menu):
+                print("Invalid index")
+                continue
             try:
                 key=list(menu.keys())[service]
                 self._services.insert_one({"customer_id":self.cid,"timestamp":datetime.now(),"service":key,"fulfilled":False})
@@ -141,9 +176,11 @@ class Customer:
         if self._services.count_documents({"customer_id":self.cid})==0:
             print("No services requested")
         else:
-            print("\n Requested Services")
+            print("\nRequested Services")
+            print("Timestamp\t\t\t\tService\t\tFulfilled")
             for x in services:
-                print(str(x["timestamp"])+"\t\t"+str(x["service"])+"\t\t\t"+str(x["fulfilled"]))
+                print(str(x["timestamp"])+"\t\t"+str(x["service"])+("\t\t" if (x["service"]=="Spa" or x["service"]=="Pool") else "\t")+str(x["fulfilled"]))
         return services
 
 
+cust=Customer()

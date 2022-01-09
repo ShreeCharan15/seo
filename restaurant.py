@@ -10,22 +10,36 @@ class Restaurant:
         return {"Pizza":800,"Burger":600,"Pasta":900,"Sandwich":400}
 
     def viewAllOrders(self):
-        print("\n All Orders")
-        print("Order ID\t\t\tTime Stamp\t\t\tCustomer ID\t\t\tFood\tServed")
+        print("\nAll Orders")
+        # print("Order ID\t\t\tTime Stamp\t\t\tCustomer ID\t\t\tFood\tServed")
+        print("Time Stamp\t\t\tCustomer ID\t\t\tFood\tServed")
         for x in self._food.find():
-            print(str(x["_id"])+"\t"+str(x["timestamp"])+"\t"+x["customer_id"]+"\t"+x["food"]+"\t"+str(x["served"]))
+            print(str(x["timestamp"])+"\t"+x["customer_id"]+"\t"+x["food"]+"\t"+str(x["served"]))
+            # print(str(x["_id"])+"\t"+str(x["timestamp"])+"\t"+x["customer_id"]+"\t"+x["food"]+"\t"+str(x["served"]))
 
     def serveOrder(self,id):
         print("\n")
         try:
             self._food.update_one({"_id":ObjectId(id)},{"$set":{"served":True}})
             print("Order served")
+            #TODO:UPDATE BILL
         except Exception as e:
             print(e)
 
 
     def viewPendingOrders(self):
-        print("\n Pending Orders")
-        print("Order ID\t\t\tTime Stamp\t\t\tCustomer ID\t\t\tFood")
-        for x in self._food.find({"served":False}):
-            print(str(x["_id"])+"\t"+str(x["timestamp"])+"\t"+x["customer_id"]+"\t"+x["food"])
+        print("\nPending Orders")
+        # print("Order ID\t\t\tTime Stamp\t\t\tCustomer ID\t\t\tFood")
+        print("Index\t\tTime Stamp\t\t\tCustomer ID\t\t\tFood")
+        index=0
+        po=list(self._food.find({"served":False}))
+        if len(po)==0:
+            print("No pending orders")
+        else:
+            for x in po:
+                # print(str(x["_id"])+"\t"+str(x["timestamp"])+"\t"+x["customer_id"]+"\t"+x["food"])
+                print(str(index)+"\t\t"+str(x["timestamp"])+"\t"+x["customer_id"]+"\t"+x["food"])
+                index+=1
+        return po
+
+
