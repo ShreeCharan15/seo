@@ -1,7 +1,7 @@
 from datetime import datetime
 import pymongo
 from restaurant import Restaurant
-from clubhouse import Clubhouse
+from clubhouse import ClubHouse
 class Customer:
     
     def __init__(self) -> None:
@@ -120,7 +120,7 @@ class Customer:
 
     def requestClubHouseService(self):
         print("\n Clubhouse Menu")
-        menu=Clubhouse().menu()
+        menu=ClubHouse().menu()
         index=0
         for key,value in menu.items():
             print(str(index)+". "+key+"\t"+str(value))
