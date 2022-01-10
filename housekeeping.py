@@ -5,7 +5,7 @@ class HouseKeeping(Staff):
         super().__init__(id=id)
         self._services=self._db["Services"]
     def viewRequests(self):
-        reqs=self._services.find({"service":"Housekeeping","fulfilled":False})
+        reqs=list(self._services.find({"service":"Housekeeping","fulfilled":False}))
         print("\nHousekeeping Requests")
         print("Index\t\tTime Stamp\t\t\tCustomer ID\t\t\tService")
         index=0

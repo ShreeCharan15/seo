@@ -25,13 +25,12 @@ class Customer:
             self.email=user["email"]
             self.phone=user["phone"]
             self.checkedIn=user["checkedIn"] if "checkedIn" in user else False
-            self.login()
     def login(self):
         print("\n")
         while True:
             print("Please enter email id")
-            # email=input()
-            email="a@gmail.com"
+            email=input()
+            # email="a@gmail.com"
             user=self._customers.find_one({"email":email})
             if(user==None):
                 print("Signing up new user")
@@ -46,8 +45,8 @@ class Customer:
                 break
             else:
                 print("Please enter your password")
-                # password=input()
-                password="a"
+                password=input()
+                # password="a"
                 if(password==user["password"]):
                     print("Login Successful")
                     self.name=user["name"]
@@ -182,5 +181,3 @@ class Customer:
                 print(str(x["timestamp"])+"\t\t"+str(x["service"])+("\t\t" if (x["service"]=="Spa" or x["service"]=="Pool") else "\t")+str(x["fulfilled"]))
         return services
 
-
-cust=Customer()
