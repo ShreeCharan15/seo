@@ -66,3 +66,6 @@ class Staff:
                     break
         else:
             print("No tasks to finish")
+
+    def updateBill(self,uid,amount):
+        self._db["Customers"].update_one({"_id":ObjectId(uid)},{"$inc":{"bill":amount}})

@@ -1,7 +1,9 @@
 from bson.objectid import ObjectId
 import pymongo
-class ClubHouse:
+from staff import Staff
+class ClubHouse(Staff):
     def __init__(self) -> None:
+        super().__init__()
         self._client=pymongo.MongoClient("mongodb://localhost:27017/")
         self._db=self._client["hotel"]
         self._services=self._db["Services"]
@@ -22,7 +24,9 @@ class ClubHouse:
         try:
             self._services.update_one({"_id":ObjectId(id)},{"$set":{"fulfilled":True}})
             print("Request Fulfilled")
-            #TODO:UPDATE BILL
+            service=self._services.find_one({"_id":ObjectId(id)})
+            price=self.menu()[service["service"]]
+            self.updateBill(service["customer_id"],price)
         except Exception as e:
             print(e)
 

@@ -4,7 +4,7 @@ choice=0
 while choice!=-1:
     print("\nEnter -1 at any stage to exit")
     print("1. View Pending Orders")
-    print("2. Serve Order")
+    print("2. Fulfil Request")
     print("3. View All Orders")
     choice=int(input())
     if choice==-1:
@@ -17,7 +17,7 @@ while choice!=-1:
             print("Nothing to serve")
         else:
             while True:
-                print("Enter the index of the order you want to serve")
+                print("Enter the index of the request you want to fulfil")
                 index=int(input())
                 if index==-1:
                     break

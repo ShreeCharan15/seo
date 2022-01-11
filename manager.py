@@ -22,11 +22,19 @@ class Manager:
             index+=1
         return bookings
     def acceptBooking(self,id,roomNo):
-        self._bookings.update_one({"_id":ObjectId(id)},{"$set":{"room":roomNo}})
-        print("Room Accepted")
+        bk=self._bookings.find_one({"_id":ObjectId(id)})
+        date=bk["date"]
+        ob=self._bookings.find_one({"$and":[{"date":date,"room":roomNo,"customer_id":{"$ne":bk["customer_id"]}}]})
+        print(ob)
+        if(ob==None):
+            self._bookings.update_one({"_id":ObjectId(id)},{"$set":{"room":roomNo}})
+            print("Booking Accepted")
+            self._customers.update_one({"_id":ObjectId(bk["customer_id"])},{"$inc":{"bill":6000}})
+        else:
+            print("Room already booked")
     def rejectBooking(self,id):
         self._bookings.delete_one({"_id":ObjectId(id)})
-        print("Room Rejected")
+        print("Booking Rejected")
     def listCustomers(self):
         customers=list(self._customers.find())
         print("\nCustomers")

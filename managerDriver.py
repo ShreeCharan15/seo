@@ -30,9 +30,16 @@ while choice!=-1:
                     print("Please enter a valid index")
                     continue
                 else:
-                    rn=input("Enter room no: ")
-                    manager.acceptBooking(b[index]["_id"],rn)
-                    break
+                    while True:
+                        rn=int(input("Enter room no: "))
+                        if rn==-1:
+                            break
+                        elif rn>10 or rn<1:
+                            print("Please enter a valid room number (1 to 10)")
+                            continue
+                        else:
+                            manager.acceptBooking(b[index]["_id"],rn)
+                            break
     elif choice==3:
         b=manager.listBookings()
         if len(b)==0:
